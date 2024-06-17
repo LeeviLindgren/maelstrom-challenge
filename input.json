@@ -1,0 +1,5 @@
+{
+  "src": "node1",
+  "dest": "node2",
+  "body": { "msg_id": 1, "type": "echo", "echo": "Hello, world!" }
+}
