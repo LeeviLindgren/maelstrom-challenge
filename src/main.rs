@@ -1,4 +1,4 @@
-use std::io::Stdout;
+use std::io::{StdoutLock, Write};
 
 use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
@@ -36,7 +36,7 @@ enum Payload {
 struct Node;
 
 impl Node {
-    fn handle(&self, msg: Message, writer: &Stdout) -> Result<()> {
+    fn handle(&self, msg: Message, writer: &mut StdoutLock) -> Result<()> {
         let response = Message {
             src: msg.dest,
             dest: msg.src,
@@ -52,22 +52,23 @@ impl Node {
                 _ => bail!("Invalid input message."),
             },
         };
-
-        serde_json::to_writer_pretty(writer, &response).context("Serializing to STDOUT")?;
+        // Why do we need the deref thing
+        serde_json::to_writer(&mut *writer, &response).context("Serializing to STDOUT")?;
+        writer.write_all(b"\n").context("Write newline to STDOUT")?;
         Ok(())
     }
 }
 
 fn main() -> Result<()> {
     let node = Node;
-    let stdin = std::io::stdin();
-    let stdout = std::io::stdout();
+    let stdin = std::io::stdin().lock();
+    let mut stdout = std::io::stdout().lock();
 
     let inputs = serde_json::Deserializer::from_reader(stdin);
 
     for item in inputs.into_iter::<Message>() {
         let msg = item.context("Deserializing message from STDIN.")?;
-        node.handle(msg, &stdout)
+        node.handle(msg, &mut stdout)
             .context("Handling the received message.")?;
     }
 
