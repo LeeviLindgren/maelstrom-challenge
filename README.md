@@ -11,7 +11,7 @@ Rust solutions for the distributed systems challenges by [Fly.io](https://fly.io
 
 - [x] [Echo](https://fly.io/dist-sys/1)
 - [x] [Unique ids](https://fly.io/dist-sys/2)
-- [ ] [Broadcast]((https://fly.io/dist-sys/3)
-- [ ] [Grow only]((https://fly.io/dist-sys/4)
-- [ ] [Kafka](https://fly.io/dist-sys/5)
-- [ ] [Totally available](https://fly.io/dist-sys/6)
+- [ ] [Broadcast](https://fly.io/dist-sys/3a)
+- [ ] [Grow only](https://fly.io/dist-sys/4)
+- [ ] [Kafka](https://fly.io/dist-sys/5a)
+- [ ] [Totally available](https://fly.io/dist-sys/6a)
