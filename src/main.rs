@@ -2,6 +2,7 @@ use std::io::{StdoutLock, Write};
 
 use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Deserialize, Serialize, Debug)]
 struct Message {
@@ -23,6 +24,14 @@ enum Payload {
         in_reply_to: i64,
         msg_id: i64,
     },
+    Generate {
+        msg_id: i64,
+    },
+    GenerateOk {
+        msg_id: i64,
+        in_reply_to: i64,
+        id: Uuid,
+    },
     Init {
         msg_id: i64,
         node_id: String,
@@ -36,6 +45,10 @@ enum Payload {
 struct Node;
 
 impl Node {
+    fn generate_uuid7() -> Uuid {
+        Uuid::now_v7()
+    }
+
     fn handle(&self, msg: Message, writer: &mut StdoutLock) -> Result<()> {
         let response = Message {
             src: msg.dest,
@@ -49,10 +62,16 @@ impl Node {
                 Payload::Init { msg_id, .. } => Payload::InitOk {
                     in_reply_to: msg_id,
                 },
+                Payload::Generate { msg_id } => Payload::GenerateOk {
+                    msg_id,
+                    in_reply_to: msg_id,
+                    id: Node::generate_uuid7(),
+                },
                 _ => bail!("Invalid input message."),
             },
         };
-        // Why do we need the deref thing
+        // Deref writer and make a mutable reference again.
+        // Write is implemented only for &mut StdoutLock
         serde_json::to_writer(&mut *writer, &response).context("Serializing to STDOUT")?;
         writer.write_all(b"\n").context("Write newline to STDOUT")?;
         Ok(())
