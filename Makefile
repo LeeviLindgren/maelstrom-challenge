@@ -1,6 +1,6 @@
 # Variables
 MAELSTROM = ~/maelstrom/maelstrom
-TARGET = target/debug/rumaelstrom
+TARGET = target/debug/maelstrom-challenge
 
 build:
 	cargo build
